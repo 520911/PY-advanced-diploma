@@ -2,7 +2,7 @@ from random import randrange
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_class.class_user import VkUser, user_token
-from db.orm_diploma import add_user_to_db, add_to_black_list, save_matches
+from db.orm_diploma import add_user_to_db, add_to_black_list, save_matches, engine
 from bot_constraint import statuses, sexes, profile_status, yes, no, choose_str, status_str
 from vk_tokens import grup_token
 import pandas as pd
@@ -20,7 +20,6 @@ def write_msg(user_id, message, attachment=None):
 def main(den: VkUser = None):
     count = 0  # Счетчик пользователей
     user_count = 1
-    black_list = []
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.message != '':
 
@@ -95,7 +94,6 @@ def main(den: VkUser = None):
                             write_msg(event.user_id, message=choose_str)
                         else:
                             write_msg(event.user_id, message="Закончились люди, для повтора поиска наберите: старт")
-                        black_list.append(user[count]['id'])
                         break
                 elif msg == 'старт':
                     statuses['status'] = 200
