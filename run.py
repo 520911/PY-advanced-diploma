@@ -1,13 +1,12 @@
 from random import randrange
 import vk_api
-from sqlalchemy.orm import declarative_base
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_class.class_user import VkUser, user_token
 from db.orm_diploma import add_user_to_db, add_to_black_list, save_matches
 from bot_constraint import statuses, sexes, profile_status, yes, no, choose_str, status_str
 from vk_tokens import grup_token
+import pandas as pd
 
-Base = declarative_base()
 
 vk1 = vk_api.VkApi(token=grup_token)
 longpoll = VkLongPoll(vk1, group_id=205558812)
@@ -84,7 +83,8 @@ def main(den: VkUser = None):
                     while count < len(den.get_search_info()):
                         count += 1
                         user = den.get_search_info()
-                        if user[count]['id'] not in black_list:
+                        df = pd.read_sql_query("select * from blacklist", engine)['match_id']
+                        if user[count]['id'] not in df.values:
                             top_photos = den.get_top_photos(owner_id=user[count]['id'])
                             write_msg(event.user_id, f"Имя: {user[count]['first_name']},\n"
                                                      f"Фамилия: {user[count]['last_name']},\n"
